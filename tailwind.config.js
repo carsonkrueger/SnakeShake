@@ -4,10 +4,15 @@ module.exports = {
   theme: {
     extend: {
       width: {
-        128: "36rem",
+        144: "36rem",
+        160: "40rem",
       },
       height: {
-        128: "36rem",
+        144: "36rem",
+        160: "40rem",
+      },
+      margin: {
+        0.8: ".2rem",
       },
     },
   },
