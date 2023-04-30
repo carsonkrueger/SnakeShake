@@ -11,8 +11,6 @@ enum direction {
 
 type snakeTile = {
   idx: number;
-  isSnake: boolean;
-  moving?: direction;
 };
 
 function App() {
@@ -20,31 +18,76 @@ function App() {
   const BOARD_CENTER = useRef(
     Math.floor((BOARD_SIZE.current * BOARD_SIZE.current) / 2)
   );
-  const [snake, setSnake] = useState(new Array<snakeTile>());
+  const SNAKE_SPEED = useRef(500);
+  const CUR_DIRECTION = useRef(direction.RIGHT);
+
+  const [snake, setSnake] = useState(new Array<number>());
+  const [board, setBoard] = useState([
+    ...Array(BOARD_SIZE.current * BOARD_SIZE.current),
+  ]);
 
   useEffect(() => {
-    let newSnake: Array<snakeTile> = new Array<snakeTile>();
+    setSnake([BOARD_CENTER.current]);
+  }, []);
 
-    for (let i: number = 0; i < BOARD_SIZE.current * BOARD_SIZE.current; i++) {
-      let tile: snakeTile = {
-        idx: i,
-        isSnake: false,
-      };
-      if (i == BOARD_CENTER.current) tile.isSnake = true;
-      console.log(BOARD_CENTER.current);
-      newSnake.push(tile);
-    }
-    setSnake(newSnake);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log([...snake]);
+    }, SNAKE_SPEED.current);
+
+    return () => clearInterval(interval);
   }, []);
 
   const isSnakeIdx = (idx: number) => {
-    return snake.at(idx)?.isSnake;
+    return snake.includes(idx);
+  };
+
+  const upIdx = (idx: number) => {
+    // if (idx < 0)
+    //   return (BOARD_SIZE.current * BOARD_SIZE.current + idx)
+    return idx - BOARD_CENTER.current;
+  };
+
+  const rightIdx = (idx: number) => {
+    return idx + 1;
+  };
+
+  const downIdx = (idx: number) => {
+    return idx - BOARD_CENTER.current;
+  };
+
+  const leftIdx = (idx: number) => {
+    return idx - 1;
+  };
+
+  const move = () => {
+    let newSnake = [...snake];
+    newSnake.shift();
+    let headPos: number = snake.at(snake.length - 1);
+    switch (CUR_DIRECTION.current) {
+      case direction.UP:
+        let newIdx = upIdx(headPos);
+        newSnake.push(newIdx);
+        break;
+      case direction.RIGHT:
+        newIdx = rightIdx(headPos);
+        newSnake.push(newIdx);
+        break;
+      case direction.DOWN:
+        newIdx = downIdx(headPos);
+        newSnake.push(newIdx);
+        break;
+      case direction.LEFT:
+        newIdx = leftIdx(headPos);
+        newSnake.push(newIdx);
+        break;
+    }
   };
 
   return (
-    <div className="flex flex-wrap justify-center items-center  w-160 h-160">
-      {snake.map((e) => (
-        <BoardTile snake={e} />
+    <div className="flex flex-wrap justify-center items-center w-160 h-160">
+      {board.map((e, i) => (
+        <BoardTile isSnake={isSnakeIdx(i)} key={i} />
       ))}
     </div>
   );

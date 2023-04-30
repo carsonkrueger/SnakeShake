@@ -1,25 +1,12 @@
-enum direction {
-  UP,
-  RIGHT,
-  DOWN,
-  LEFT,
-}
-
-type snakeTile = {
-  idx: number;
-  isSnake: boolean;
-  moving?: direction;
-};
-
 type privateProps = {
-  snake: snakeTile;
+  isSnake: boolean;
 };
 
-export default function BoardTile({ snake }: privateProps) {
+export default function BoardTile({ isSnake }: privateProps) {
   return (
     <div
       className={`border-black rounded-md ${
-        snake.isSnake ? "bg-red-500" : "bg-green-500"
+        isSnake ? "bg-blue-500" : "bg-green-500"
       } col h-9 w-9 m-0.8`}
     ></div>
   );
