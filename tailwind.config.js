@@ -4,16 +4,41 @@ module.exports = {
   theme: {
     extend: {
       width: {
-        144: "36rem",
+        112: "28rem",
+        120: "32rem",
+        136: "36rem",
         160: "40rem",
       },
       height: {
-        144: "36rem",
+        112: "28rem",
+        120: "32rem",
+        136: "36rem",
         160: "40rem",
       },
       margin: {
         0.8: ".2rem",
+        0.7: ".175rem",
+        0.6: ".15rem",
       },
+      backgroundColor: {
+        "green-450": "#2fd45d",
+      },
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+      },
+    },
+    screens: {
+      sm: "576px",
+      // => @media (min-width: 576px) { ... }
+
+      md: "768px",
+      // => @media (min-width: 768px) { ... }
+
+      lg: "992px",
+      // => @media (min-width: 992px) { ... }
+
+      xl: "1200px",
+      // => @media (min-width: 1200px) { ... }
     },
   },
   plugins: [],
