@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import BoardTile from "./components/BoardTile";
+import Button from "./components/Button";
 
 enum direction {
   UP,
@@ -9,41 +10,50 @@ enum direction {
   LEFT,
 }
 
-type snakeTile = {
-  idx: number;
-};
-
 function App() {
   const BOARD_WIDTH = useRef(15);
   const BOARD_CENTER = useRef(
     Math.floor((BOARD_WIDTH.current * BOARD_WIDTH.current) / 2)
   );
-  const MAX_BOARD_SIZE = useRef(BOARD_WIDTH.current * BOARD_WIDTH.current);
-  const SNAKE_SPEED = useRef(500);
-  const CUR_DIRECTION = useRef(direction.RIGHT);
-  const [snake, setSnake] = useState([BOARD_CENTER.current]);
-  const [board, setBoard] = useState([
-    ...Array(BOARD_WIDTH.current * BOARD_WIDTH.current),
-  ]);
+  const BOARD_MAX_SIZE = useRef(BOARD_WIDTH.current * BOARD_WIDTH.current);
+  const BOARD = useRef([...Array(BOARD_WIDTH.current * BOARD_WIDTH.current)]);
+
+  const SNAKE_SPEED_INIT = useRef(400);
+  const snakeSpeed = useRef(SNAKE_SPEED_INIT.current);
+
+  const initDirection = useRef(direction.RIGHT);
+  const curDirection = useRef(initDirection.current);
+
+  const [isPaused, setIsPaused] = useState(true);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [appleIdx, setAppleIdx] = useState(BOARD_CENTER.current + 3);
+  const [snake, setSnake] = useState([BOARD_CENTER.current - 3]);
+  // const [board, setBoard] = useState([
+  //   ...Array(BOARD_WIDTH.current * BOARD_WIDTH.current),
+  // ]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       switch (e.key) {
         case "w":
         case "ArrowUp":
-          CUR_DIRECTION.current = direction.UP;
+          if (initDirection.current !== direction.DOWN)
+            curDirection.current = direction.UP;
           break;
         case "d":
         case "ArrowRight":
-          CUR_DIRECTION.current = direction.RIGHT;
+          if (initDirection.current !== direction.LEFT)
+            curDirection.current = direction.RIGHT;
           break;
         case "s":
         case "ArrowDown":
-          CUR_DIRECTION.current = direction.DOWN;
+          if (initDirection.current !== direction.UP)
+            curDirection.current = direction.DOWN;
           break;
         case "a":
         case "ArrowLeft":
-          CUR_DIRECTION.current = direction.LEFT;
+          if (initDirection.current !== direction.RIGHT)
+            curDirection.current = direction.LEFT;
           break;
       }
     }
@@ -54,12 +64,13 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      move();
-      console.log(snake);
-    }, SNAKE_SPEED.current);
+      initDirection.current = curDirection.current;
+      if (!isPaused && !isGameOver) move();
+      // console.log(snake);
+    }, snakeSpeed.current);
 
     return () => clearInterval(interval);
-  }, [snake]);
+  }, [snake, isPaused]);
 
   function isSnakeIdx(idx: number): boolean {
     return snake.includes(idx);
@@ -82,7 +93,7 @@ function App() {
   }
 
   function isInBounds(idx: number): boolean {
-    switch (CUR_DIRECTION.current) {
+    switch (curDirection.current) {
       case direction.UP:
         if (idx < 0) return false;
         return true;
@@ -90,7 +101,7 @@ function App() {
         if (idx % BOARD_WIDTH.current === 0) return false;
         return true;
       case direction.DOWN:
-        if (idx > MAX_BOARD_SIZE.current) return false;
+        if (idx > BOARD_MAX_SIZE.current) return false;
         return true;
       case direction.LEFT:
         if (idx % BOARD_WIDTH.current === BOARD_WIDTH.current - 1) return false;
@@ -99,30 +110,63 @@ function App() {
   }
 
   function move(): void {
-    let headPos: number = ensure(snake.at(snake.length - 1));
+    let headIdx: number = ensure(snake.at(snake.length - 1));
     let newIdx = 0;
 
     const newSnake = [...snake];
-    newSnake.shift();
 
-    switch (CUR_DIRECTION.current) {
+    // grow snake until 4 long AND grow snake when eating apple
+    if (snake.length >= 4 && appleIdx != headIdx) newSnake.shift();
+    if (appleIdx == headIdx) eat();
+
+    switch (curDirection.current) {
       case direction.UP:
-        newIdx = upIdx(headPos);
+        newIdx = upIdx(headIdx);
         break;
       case direction.RIGHT:
-        newIdx = rightIdx(headPos);
+        newIdx = rightIdx(headIdx);
         break;
       case direction.DOWN:
-        newIdx = downIdx(headPos);
+        newIdx = downIdx(headIdx);
         break;
       case direction.LEFT:
-        newIdx = leftIdx(headPos);
+        newIdx = leftIdx(headIdx);
         break;
     }
-    if (isInBounds(newIdx)) {
+
+    if (isInBounds(newIdx) && !isSnakeIdx(newIdx)) {
       newSnake.push(newIdx);
       setSnake(() => newSnake);
+    } else {
+      gameover();
     }
+  }
+
+  function start(): void {
+    setIsPaused(false);
+  }
+
+  function restart(): void {
+    setIsPaused(true);
+    setIsGameOver(false);
+    setAppleIdx(BOARD_CENTER.current + 3);
+    setSnake([BOARD_CENTER.current - 3]);
+    snakeSpeed.current = SNAKE_SPEED_INIT.current;
+    curDirection.current = direction.RIGHT;
+  }
+
+  function eat() {
+    let pos: number = -1;
+    while (pos === -1 || isSnakeIdx(pos))
+      pos = Math.floor(Math.random() * BOARD_MAX_SIZE.current);
+    setAppleIdx(pos);
+
+    if (snakeSpeed.current >= 100) snakeSpeed.current -= 8;
+  }
+
+  function gameover() {
+    // alert("GAME OVER");
+    setIsGameOver(true);
   }
 
   function ensure<T>(argument: T | undefined | null): T {
@@ -132,10 +176,16 @@ function App() {
   }
 
   return (
-    <div className="flex flex-wrap justify-center items-center w-160 h-160">
-      {board.map((e, i) => (
-        <BoardTile isSnake={isSnakeIdx(i)} key={i} />
-      ))}
+    <div className="">
+      <div className="flex flex-wrap justify-center items-center w-160 h-160">
+        {BOARD.current.map((e, i) => (
+          <BoardTile isSnake={isSnakeIdx(i)} isApple={appleIdx === i} key={i} />
+        ))}
+      </div>
+      <Button
+        text={`${isPaused ? "PLAY" : "RESTART"}`}
+        onClick={isPaused ? start : restart}
+      />
     </div>
   );
 }
