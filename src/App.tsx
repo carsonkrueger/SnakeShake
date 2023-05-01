@@ -21,8 +21,8 @@ function App() {
   const BOARD = useRef([...Array(BOARD_WIDTH.current * BOARD_WIDTH.current)]);
 
   const SNAKE_SPEED_INIT = useRef(225);
-  const SNAKE_SPEED_INCREASE = useRef(4);
-  const SNAKE_SPEED_MAX = useRef(125);
+  const SNAKE_SPEED_INCREASE = useRef(5);
+  const SNAKE_SPEED_MAX = useRef(100);
   const snakeSpeed = useRef(SNAKE_SPEED_INIT.current);
 
   const curDirection = useRef(direction.RIGHT);
@@ -203,16 +203,16 @@ function App() {
   }
 
   return (
-    <div className="flex flex-col justify-between">
-      <div className="flex flex-row items-center justify-between text-blue-500 text-4xl font-poppins [&>*]:min-w-16">
+    <div className="rounded-lg bg-green-600 flex flex-col justify-between p-5">
+      <div className="flex flex-row items-center justify-between text-white text-2xl font-poppins [&>*]:min-w-16">
         <div></div>
-        {score.current}
+        Score: {score.current}
         <div className="flex flex-row items-center text-2xl">
           <img src={trophy} className="h-7 w-7" />
           {highscore}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center items-center w-80 h-80 sm:w-120 sm:h-120 lg:w-160 lg:h-160 md:w-136 md:h-136">
+      <div className="relative flex flex-wrap justify-center items-center w-80 h-80 sm:w-120 sm:h-120 lg:w-160 lg:h-160 md:w-136 md:h-136">
         {BOARD.current.map((_, i) => (
           <BoardTile
             idx={i}
@@ -226,12 +226,12 @@ function App() {
       <div className="flex flex-row justify-center px-5 [&>*]:mx-5">
         <Button
           text={`${isPaused ? "PLAY" : "RESET"}`}
-          className="font-poppins bg-blue-500 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
+          className="hover:animate- font-poppins bg-blue-600 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
           onClick={isPaused ? start : reset}
         />
         {/* <Button
           text={"INVITE"}
-          className="bg-blue-500 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
+          className="bg-blue-600 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
         /> */}
       </div>
     </div>

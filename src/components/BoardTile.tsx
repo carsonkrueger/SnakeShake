@@ -9,7 +9,7 @@ export default function BoardTile({ idx, isSnake, isApple }: privateProps) {
     <div
       className={`border-black rounded-md ${
         isSnake
-          ? "bg-blue-500"
+          ? "bg-blue-600"
           : isApple
           ? "bg-red-500"
           : idx % 2 == 1
