@@ -45,18 +45,22 @@ function App() {
           case "w":
           case "ArrowUp":
             directionQueue.current.push(direction.UP);
+            setIsPaused(false);
             break;
           case "d":
           case "ArrowRight":
             directionQueue.current.push(direction.RIGHT);
+            setIsPaused(false);
             break;
           case "s":
           case "ArrowDown":
             directionQueue.current.push(direction.DOWN);
+            setIsPaused(false);
             break;
           case "a":
           case "ArrowLeft":
             directionQueue.current.push(direction.LEFT);
+            setIsPaused(false);
             break;
         }
     }
