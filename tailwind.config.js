@@ -20,11 +20,22 @@ module.exports = {
         0.7: ".175rem",
         0.6: ".15rem",
       },
+      minWidth: {
+        16: "4rem",
+      },
+      maxWidth: {
+        16: "4rem",
+        20: "5rem",
+      },
       backgroundColor: {
         "green-450": "#2fd45d",
       },
       fontFamily: {
         poppins: ["Poppins", "sans-serif"],
+      },
+      fontSize: {
+        "3xl": "1.75rem",
+        "4xl": "2rem",
       },
     },
     screens: {
