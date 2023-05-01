@@ -196,7 +196,7 @@ function App() {
           {highscore}
         </div>
       </div>
-      <div className="flex flex-wrap justify-center items-center w-112 h-112  sm:w-120 sm:h-120 lg:w-160 lg:h-160 md:w-136 md:h-136">
+      <div className="flex flex-wrap justify-center items-center w-80 h-80 sm:w-120 sm:h-120 lg:w-160 lg:h-160 md:w-136 md:h-136">
         {BOARD.current.map((_, i) => (
           <BoardTile
             idx={i}

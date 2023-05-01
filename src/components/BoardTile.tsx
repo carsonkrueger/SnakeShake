@@ -15,7 +15,7 @@ export default function BoardTile({ idx, isSnake, isApple }: privateProps) {
           : idx % 2 == 1
           ? "bg-green-500"
           : "bg-green-450"
-      } col h-6 w-6 m-0.6 sm:h-7 md:h-8 md:w-8 md:m-0.7 sm:w-7 lg:h-9 lg:w-9 lg:m-0.8 `}
+      } col h-4.25 w-4.25 m-0.5 sm:h-6.5 sm:w-6.5 sm:m-0.6 md:h-8 md:w-8 md:m-0.7 lg:h-9 lg:w-9 lg:m-0.8 `}
     ></div>
   );
 }
