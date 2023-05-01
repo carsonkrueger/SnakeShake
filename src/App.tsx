@@ -25,8 +25,8 @@ function App() {
   const SNAKE_SPEED_MAX = useRef(125);
   const snakeSpeed = useRef(SNAKE_SPEED_INIT.current);
 
-  const initDirection = useRef(direction.RIGHT);
-  const curDirection = useRef(initDirection.current);
+  const curDirection = useRef(direction.RIGHT);
+  const directionQueue = useRef([direction.RIGHT]);
 
   const score = useRef(0);
   const [highscore, setHighscore] = useState(0);
@@ -40,28 +40,25 @@ function App() {
     if (localStorage.getItem("highscore") !== null)
       setHighscore(parseInt(ensure(localStorage.getItem("highscore"))));
     function handleKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case "w":
-        case "ArrowUp":
-          if (initDirection.current !== direction.DOWN)
-            curDirection.current = direction.UP;
-          break;
-        case "d":
-        case "ArrowRight":
-          if (initDirection.current !== direction.LEFT)
-            curDirection.current = direction.RIGHT;
-          break;
-        case "s":
-        case "ArrowDown":
-          if (initDirection.current !== direction.UP)
-            curDirection.current = direction.DOWN;
-          break;
-        case "a":
-        case "ArrowLeft":
-          if (initDirection.current !== direction.RIGHT)
-            curDirection.current = direction.LEFT;
-          break;
-      }
+      if (directionQueue.current.length <= 4)
+        switch (e.key) {
+          case "w":
+          case "ArrowUp":
+            directionQueue.current.push(direction.UP);
+            break;
+          case "d":
+          case "ArrowRight":
+            directionQueue.current.push(direction.RIGHT);
+            break;
+          case "s":
+          case "ArrowDown":
+            directionQueue.current.push(direction.DOWN);
+            break;
+          case "a":
+          case "ArrowLeft":
+            directionQueue.current.push(direction.LEFT);
+            break;
+        }
     }
     document.addEventListener("keydown", handleKeyDown);
 
@@ -70,7 +67,6 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      initDirection.current = curDirection.current;
       if (!isPaused && !isGameOver) move();
     }, snakeSpeed.current);
 
@@ -114,6 +110,19 @@ function App() {
     }
   }
 
+  function oppositeDirection(dir: direction): direction {
+    switch (dir) {
+      case direction.UP:
+        return direction.DOWN;
+      case direction.RIGHT:
+        return direction.LEFT;
+      case direction.DOWN:
+        return direction.UP;
+      case direction.LEFT:
+        return direction.RIGHT;
+    }
+  }
+
   function move(): void {
     let headIdx: number = ensure(snake.at(snake.length - 1));
     let newIdx = 0;
@@ -123,6 +132,12 @@ function App() {
     // grow snake until 4 long AND grow snake when eating apple
     if (snake.length >= 4 && appleIdx != headIdx) newSnake.shift();
     if (appleIdx == headIdx) eat();
+
+    if (directionQueue.current.length > 0) {
+      let nextDirection = ensure(directionQueue.current.shift());
+      if (nextDirection !== oppositeDirection(curDirection.current))
+        curDirection.current = nextDirection;
+    }
 
     switch (curDirection.current) {
       case direction.UP:
@@ -158,6 +173,7 @@ function App() {
     setSnake([BOARD_CENTER.current - 3]);
     snakeSpeed.current = SNAKE_SPEED_INIT.current;
     curDirection.current = direction.RIGHT;
+    directionQueue.current = [direction.RIGHT];
     score.current = 0;
   }
 
