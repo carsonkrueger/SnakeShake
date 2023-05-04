@@ -1,5 +1,6 @@
 type privateProps = {
-  text: string;
+  text?: string;
+  children?: JSX.Element;
   className?: string;
   onClick?: () => void;
   href?: string;
@@ -7,7 +8,8 @@ type privateProps = {
 };
 
 export default function Button({
-  text,
+  text = "",
+  children = <></>,
   className,
   onClick,
   href = "#",
@@ -16,6 +18,7 @@ export default function Button({
   return (
     <a className={className} onClick={onClick} href={href} target={target}>
       {text}
+      {children}
     </a>
   );
 }

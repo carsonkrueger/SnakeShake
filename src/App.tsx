@@ -3,7 +3,22 @@ import { useEffect, useRef, useState } from "react";
 import BoardTile from "./components/BoardTile";
 import Button from "./components/Button";
 
-import trophy from "./assets/trophy.png";
+import trophyImg from "./assets/trophy.png";
+import playImg from "./assets/play.svg";
+import restartImg from "./assets/restart.svg";
+
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3000");
+
+socket.on("connect", () => {
+  console.log(`connected with ${socket.id}`);
+  socket.emit("send_move", "Hello World!");
+});
+
+socket.on("recieve_move", (msg) => {
+  console.log(msg);
+});
 
 enum direction {
   UP,
@@ -18,7 +33,7 @@ function App() {
     Math.floor((BOARD_WIDTH.current * BOARD_WIDTH.current) / 2)
   );
   const BOARD_MAX_SIZE = useRef(BOARD_WIDTH.current * BOARD_WIDTH.current);
-  const BOARD = useRef([...Array(BOARD_WIDTH.current * BOARD_WIDTH.current)]);
+  const BOARD = useRef([...Array(BOARD_MAX_SIZE.current)]);
 
   const SNAKE_SPEED_INIT = useRef(225);
   const SNAKE_SPEED_INCREASE = useRef(5);
@@ -212,7 +227,7 @@ function App() {
         <div></div>
         Score: {score.current}
         <div className="flex flex-row items-center text-2xl">
-          <img src={trophy} className="h-7 w-7" />
+          <img src={trophyImg} className="h-7 w-7" />
           {highscore}
         </div>
       </div>
@@ -227,16 +242,28 @@ function App() {
         ))}
       </div>
 
-      <div className="flex flex-row justify-center px-5 [&>*]:mx-5">
+      <div className="flex flex-row justify-around pt-3 ">
         <Button
-          text={`${isPaused ? "PLAY" : "RESET"}`}
-          className="hover:animate- font-poppins bg-blue-600 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
+          children={
+            isPaused ? (
+              <img className=" w-7 h-7" src={playImg} />
+            ) : (
+              <img className=" w-7 h-7" src={restartImg} />
+            )
+          }
+          className="hover:animate- font-poppins bg-blue-600 text-white text-center rounded-lg px-3 py-1 text-lg"
           onClick={isPaused ? start : reset}
         />
-        {/* <Button
-          text={"INVITE"}
-          className="bg-blue-600 text-white text-center rounded-lg px-3 mt-5 py-1 text-lg"
-        /> */}
+        <div className="flex justify-center items-center">
+          <Button
+            text={"JOIN"}
+            className="bg-blue-600 text-white text-center text-ellipsis rounded-lg px-3 py-1 text-lg"
+          />
+          <input
+            placeholder="Enter Code"
+            className="font-poppins text-md rounded-sm px-1 mx-3 w-[6rem] h-6 text"
+          />
+        </div>
       </div>
     </div>
   );
